@@ -11,15 +11,17 @@ class User  implements Crud
     private $city_name;
 
     private $username;
+    private $file_name;
     private $password;
 
 
- function __construct($first_name, $last_name,$city_name, $username, $password) {
+ function __construct($first_name, $last_name,$city_name, $username,$file_name, $password) {
     $this->first_name = $first_name;
     $this->last_name = $last_name;
     $this->city_name = $city_name;
     $this->username = $username;
     $this->password = $password;
+    $this->file_name = $file_name;
     // $this->db ;
 }
 /**
@@ -52,6 +54,7 @@ public function save()
     $ln = $this->last_name;
     $city = $this->city_name;
     $uname = $this->username;
+    $file_path = $this->file_name;
     $this->hashPassword();//!Do not understand this line
     $pass = $this->password;
     $db_con = new DBConnector;
@@ -61,7 +64,7 @@ public function save()
     //  or die("Error".mysqli_error($db_con));
     //  $db_con->closeDatabase();
      //!Style 2
-     $res = $mysqli -> query("INSERT INTO user(first_name,last_name,user_city, username, password) VALUES ('$fn','$ln','$city','$uname','$pass')");
+     $res = $mysqli -> query("INSERT INTO user(first_name,last_name,user_city, username, file_path, password) VALUES ('$fn','$ln','$city','$uname','$file_path','$pass')");
      if (!$res) {
         echo("Error description: " . $mysqli -> error);
       }
@@ -91,7 +94,8 @@ public function readAll(){
         $fn = $this->first_name;
         $ln = $this->last_name;
         $city = $this->city_name;
-        if($fn == "" || $ln == "" || $city == ""){
+        $file = $this->file_name;
+        if($fn == "" || $ln == "" || $city == "" || $file = ""){
             return false;
         }
         return true;
