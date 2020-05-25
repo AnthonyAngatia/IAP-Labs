@@ -3,6 +3,8 @@ include_once 'DBConnector.php';
 include_once 'user.php';
 include_once 'FileUploader.php';
 $con = new DBConnector;
+$error = "";
+
 
 if(isset($_POST['btn-save'])){
     $first_name = $_POST['first_name'];
@@ -10,53 +12,53 @@ if(isset($_POST['btn-save'])){
     $city = $_POST['city_name'];
     $username = $_POST['username'];
     $password = $_POST['password'];
-//Object for uploading the file
-$uploader = new FileUploader;
-// $target_directory = $uploader->getTargetDirectory();
-$file_type = $_FILES["fileToUpload"]["type"];
-$original_name = $_FILES["fileToUpload"]["name"];
-$file_size = $_FILES["fileToUpload"]["size"];
-$tmp_name =$_FILES["fileToUpload"]["tmp_name"];
-$uploader->setOriginalName($original_name);
-$uploader->setFileType($original_name);
-$uploader->setFileSize($file_size);
-$uploader->setTmp_name($tmp_name);
-
-//We should only upload the file if 
-$error = "";
-$file_upload_response = $uploader->uploadFile();
-if($file_upload_response){
-    $file_path = $uploader->saveFilePathTo();//File path is taken to the user class to the query statement
-    $uploader->moveFile();
-    saveToDatabase();
-}
-else{
-    $error = $uploader->getErr_message();
-    // echo "Error uploading file.Please ensure the file is an image and of 50KB";
-    // echo $error;
+    //Time
+    $utc_timestamp = $_POST['utc_timestamp'];
+    $offset = $_POST['time_zone_offset'];
+    //Object for uploading the file
+    $uploader = new FileUploader;
+    $uploader->setOriginalName($_FILES["fileToUpload"]["name"]);
+    $uploader->setFileType($_FILES["fileToUpload"]["name"]);
+    $uploader->setFileSize($_FILES["fileToUpload"]["size"]);
+    $uploader->setTmp_name($_FILES["fileToUpload"]["tmp_name"]);
     
-}
-function saveToDatabase(){
-    $user = new User($first_name,$last_name,$city, $username,$file_path, $password);
-    if(!$user->validateForm()){
-        $user->createFormErrorSessions();
-        header("Refresh:0");
-        die();
-    }
-    //!IsUserExist comes here
-    $res = $user->save();
-    //Check if save operation was successful
-    if($res){//!This method needs to be altered.
-        echo "Save operation successful";   
+    
+    $file_upload_response = $uploader->uploadFile();
+    if($file_upload_response){
+        $file_path = $uploader->saveFilePathTo();//File path is taken to the user class to the query statement
+        $uploader->moveFile();
+//Save to dtBE    
+        $user = new User($first_name,$last_name,$city, $username,$file_path, $utc_timestamp, $offset, $password);
+        if(!$user->validateForm()){
+            $user->createFormErrorSessions();
+            // header("Refresh:0");
+            die();
+        }
+        //!IsUserExist comes here
+        $res = $user->save();
+        //Check if save operation was successful
+        if($res){
+            echo "Save operation successful";   
+        }
+        else{
+            echo "An error ocurred";
+        }
+        $con -> closeDatabase();
+    
+
     }
     else{
-        //The file can't be uploaded.
-        echo "An error ocurred";
+        $error = $uploader->getErr_message();
+        
     }
-    $con -> closeDatabase();
-    }
+    // echo $utc_timestamp;
+    // echo "<br>";
+    // echo $offset;
 
+    
+    
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -67,6 +69,8 @@ function saveToDatabase(){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My WebApp</title>
     <script type="javascript" src="validate.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="timezone.js" type="text/javascript"></script>
     <link rel="stylesheet" href="validate.css">
 </head>
 
@@ -110,6 +114,9 @@ function saveToDatabase(){
             <tr>
                 <td><button type="submit" name="btn-save">SAVE</button></td>
             </tr>
+            <!-- Hidden controls to strore the clients utc date and time zxone -->
+            <input type="hidden" name="utc_timestamp" id="utc_timestamp" value="">
+            <input type="hidden" name="time_zone_offset" id="time_zone_offset" value="">
         </table>
     </form>
 </body>

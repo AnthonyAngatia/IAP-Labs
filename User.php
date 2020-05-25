@@ -14,14 +14,19 @@ class User  implements Crud
     private $file_name;
     private $password;
 
+    private $UTC_timestamp;
+    private $offset;
 
- function __construct($first_name, $last_name,$city_name, $username,$file_name, $password) {
+
+ function __construct($first_name, $last_name,$city_name, $username,$file_name,$UTC_timestamp, $offset, $password) {
     $this->first_name = $first_name;
     $this->last_name = $last_name;
     $this->city_name = $city_name;
     $this->username = $username;
     $this->password = $password;
     $this->file_name = $file_name;
+    $this->UTC_timestamp = $UTC_timestamp;
+    $this->offset = $offset;
     // $this->db ;
 }
 /**
@@ -55,6 +60,10 @@ public function save()
     $city = $this->city_name;
     $uname = $this->username;
     $file_path = $this->file_name;
+    $UTC_timestamp = $this->UTC_timestamp;
+    $offset = $this->offset;
+    
+
     $this->hashPassword();//!Do not understand this line
     $pass = $this->password;
     $db_con = new DBConnector;
@@ -64,7 +73,7 @@ public function save()
     //  or die("Error".mysqli_error($db_con));
     //  $db_con->closeDatabase();
      //!Style 2
-     $res = $mysqli -> query("INSERT INTO user(first_name,last_name,user_city, username, file_path, password) VALUES ('$fn','$ln','$city','$uname','$file_path','$pass')");
+     $res = $mysqli -> query("INSERT INTO user(first_name,last_name,user_city, username, file_path, time_utc, offset, password) VALUES ('$fn','$ln','$city','$uname','$file_path','$UTC_timestamp','$offset','$pass')");
      if (!$res) {
         echo("Error description: " . $mysqli -> error);
       }
