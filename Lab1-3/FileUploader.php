@@ -74,7 +74,7 @@ class FileUploader
         $path = self::$target_directory.$this->file_original_name;
 
          if(file_exists($path)){
-            $msg = "File Already exists. Please try Again!!." ;
+            $msg = "File Already exists. Please upload another image!." ;
             array_push($this->err_message,$msg);
             return true;
          }
@@ -99,7 +99,7 @@ class FileUploader
      }
      public function fileTypeIsCorrect()
      {
-         $extensions_arr = array("jpg","jpeg","png","gif");
+         $extensions_arr = array("jpg","jpeg","png","gif","jfif");
          if(in_array($this->file_type, $extensions_arr)){
              return true;
          }
